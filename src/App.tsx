@@ -99,8 +99,16 @@ const TYPED_LINES = [
   "...",
   "٩(◕‿◕)۶ ٩(◕‿◕)۶ ٩(◕‿◕)۶"
 ];
-const TYPED_CHAR_DELAY = 100;
-const POST_TYPING_SCENE_DELAY = 1000;
+// Timed to music.m4a: its beat kicks in about 4 s after it starts (~103.5
+// BPM). The text finishes typing one beat before the kick, and the cake starts
+// dropping on it. Re-check these two numbers if the song changes.
+const SONG_KICK_SECONDS = 4.0;
+const SONG_BEAT_SECONDS = 60 / 103.5;
+// One tick per character, plus one per line to move on to the next line.
+const TYPING_TICKS = TYPED_LINES.reduce((sum, line) => sum + line.length + 1, 0);
+const TYPED_CHAR_DELAY =
+  ((SONG_KICK_SECONDS - SONG_BEAT_SECONDS) * 1000) / TYPING_TICKS;
+const POST_TYPING_SCENE_DELAY = SONG_BEAT_SECONDS * 1000;
 const CURSOR_BLINK_INTERVAL = 480;
 
 type BirthdayCardConfig = {
@@ -386,7 +394,7 @@ export default function App() {
   const backgroundAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const audio = new Audio("/music.mp3");
+    const audio = new Audio("/music.m4a");
     audio.loop = true;
     audio.preload = "auto";
     backgroundAudioRef.current = audio;
