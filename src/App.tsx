@@ -322,13 +322,18 @@ function AnimatedScene({
 function ConfiguredOrbitControls() {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const camera = useThree((state) => state.camera);
+  const get = useThree((state) => state.get);
 
   useEffect(() => {
+    // Tall phone screens see much less side to side, so start further back
+    // there to fit the table and frames; widescreens keep the default view.
+    const { width, height } = get().size;
+    const fit = Math.max(1, 0.8 / (width / height));
     const offset = new Vector3(
       Math.sin(ORBIT_INITIAL_AZIMUTH) * ORBIT_INITIAL_RADIUS,
       ORBIT_INITIAL_HEIGHT,
       Math.cos(ORBIT_INITIAL_AZIMUTH) * ORBIT_INITIAL_RADIUS
-    );
+    ).multiplyScalar(fit);
     const cameraPosition = ORBIT_TARGET.clone().add(offset);
     camera.position.copy(cameraPosition);
     camera.lookAt(ORBIT_TARGET);
@@ -338,7 +343,7 @@ function ConfiguredOrbitControls() {
       controls.target.copy(ORBIT_TARGET);
       controls.update();
     }
-  }, [camera]);
+  }, [camera, get]);
 
   return (
     <OrbitControls
@@ -474,26 +479,35 @@ export default function App() {
     return () => window.clearInterval(handle);
   }, []);
 
+  // One step forward: start the intro, then blow out the candle. Triggered by
+  // Space on a keyboard, or by tapping the on-screen prompts on a phone.
+  const advance = useCallback(() => {
+    if (!hasStarted) {
+      playBackgroundMusic();
+      setHasStarted(true);
+      return;
+    }
+    if (hasAnimationCompleted && isCandleLit) {
+      setIsCandleLit(false);
+      setFireworksActive(true);
+    }
+  }, [hasStarted, hasAnimationCompleted, isCandleLit, playBackgroundMusic]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code !== "Space" && event.key !== " ") {
         return;
       }
       event.preventDefault();
-      if (!hasStarted) {
-        playBackgroundMusic();
-        setHasStarted(true);
-        return;
-      }
-      if (hasAnimationCompleted && isCandleLit) {
-        setIsCandleLit(false);
-        setFireworksActive(true);
-      }
+      advance();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [hasStarted, hasAnimationCompleted, isCandleLit, playBackgroundMusic]);
+  }, [advance]);
+
+  // Touch screens get "tap" wording; mouse + keyboard get "press space".
+  const [isTouch] = useState(() => window.matchMedia("(pointer: coarse)").matches);
 
   const handleCardToggle = useCallback((id: string) => {
     setActiveCardId((current) => (current === id ? null : id));
@@ -526,8 +540,15 @@ export default function App() {
           })}
         </div>
       </div>
+      {!hasStarted && (
+        <button type="button" className="start-overlay" onClick={advance}>
+          {isTouch ? "tap to start" : "press space or click to start"}
+        </button>
+      )}
       {hasAnimationCompleted && isCandleLit && (
-        <div className="hint-overlay">press space to blow out the candle</div>
+        <button type="button" className="hint-overlay" onClick={advance}>
+          {isTouch ? "tap here to blow out the candle" : "press space to blow out the candle"}
+        </button>
       )}
       <Canvas
         gl={{ alpha: true }}

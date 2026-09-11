@@ -18,6 +18,8 @@ html, body {
 .App {
   width: 100vw;
   height: 100vh;
+  /* On phones, 100vh includes the area under the browser's address bar. */
+  height: 100dvh;
   overflow: hidden;
   position: relative;
   background: #0b0212;
@@ -67,13 +69,33 @@ canvas {
   min-height: 1.25em;
 }
 
-.space-hint {
-  margin-top: 1.5rem;
+/* Tighter spacing so the candle prompt fits on phone screens. */
+@media (max-width: 480px) {
+  .hint-overlay,
+  .start-overlay {
+    letter-spacing: 0.16em;
+  }
+}
+
+/* Full-screen tap target shown before the intro starts. */
+.start-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 1rem 3rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
   font-family: "Courier New", Courier, monospace;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  opacity: 0.65;
+  color: rgba(255, 242, 228, 0.75);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hint-overlay {
@@ -86,9 +108,15 @@ canvas {
   text-transform: uppercase;
   color: rgba(255, 242, 228, 0.9);
   opacity: 0.85;
-  pointer-events: none;
   z-index: 3;
-  max-width: 90vw;
+  border: none;
+  font-size: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  /* max-content: otherwise left: 50% squeezes the pill to half the screen. */
+  width: max-content;
+  max-width: calc(100vw - 2rem);
   text-align: center;
   padding: 0.6rem 1.2rem;
   border-radius: 999px;
