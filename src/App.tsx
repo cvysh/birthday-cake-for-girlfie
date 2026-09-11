@@ -78,16 +78,16 @@ const BACKGROUND_FADE_START = Math.max(
   0
 );
 
-// The backdrop and the lighting come from the same 360° panorama: a sharp 4K
-// JPG to look at (tone-mapped in advance), and a small 1K HDR that only lights
-// the cake and frames.
+// 360° panorama (2:1, in public/) used as the backdrop and to light the scene.
 const BACKGROUND_FILE = "/background_4k.jpg";
-const LIGHTING_FILE = "/lighting_1k.hdr";
-// The panorama is a dusk seaside, so its light is dim; this brightens the
-// light it casts on the cake and frames.
-const ENVIRONMENT_LIGHT = 1.5;
-// Turn the panorama so the sunset glow sits behind the table in the opening
-// view (the camera starts on +x looking toward -x).
+// How bright the backdrop looks (1 = as photographed). Lower keeps the sky
+// dark so the candle, tea lights and fairy lights stand out.
+const BACKGROUND_BRIGHTNESS = 0.55;
+// How much light the panorama casts on the cake and frames.
+const ENVIRONMENT_LIGHT = 1;
+// Turn the panorama so the middle of the skyline faces the opening view and
+// the seam where its edges meet sits behind it (the camera starts on +x
+// looking toward -x).
 const BACKGROUND_ROTATION: [number, number, number] = [0, Math.PI, 0];
 
 const TYPED_LINES = [
@@ -586,11 +586,11 @@ export default function App() {
           <Environment
             files={BACKGROUND_FILE}
             background="only"
-            backgroundIntensity={environmentProgress}
+            backgroundIntensity={BACKGROUND_BRIGHTNESS * environmentProgress}
             backgroundRotation={BACKGROUND_ROTATION}
           />
           <Environment
-            files={LIGHTING_FILE}
+            files={BACKGROUND_FILE}
             environmentIntensity={ENVIRONMENT_LIGHT * environmentProgress}
             environmentRotation={BACKGROUND_ROTATION}
           />
