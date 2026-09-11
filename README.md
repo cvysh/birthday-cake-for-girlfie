@@ -2,6 +2,8 @@
 
 A little birthday surprise I made for my girlfriend for her 20th birthday. It types out a message, drops a cake onto a table under fairy lights by a city skyline at night, and lets her blow out the candle to set off fireworks, all timed to *Get Schwifty*.
 
+**See it live:** [birthday-cake-for-girlfie.vercel.app](https://birthday-cake-for-girlfie.vercel.app/)
+
 ## What happens
 
 1. **Tap (or press Space) to start.** The music begins and a terminal types out the message.
