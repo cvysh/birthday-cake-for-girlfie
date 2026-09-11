@@ -1,5 +1,5 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, OrbitControls } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import {
   Suspense,
   useCallback,
@@ -17,7 +17,7 @@ import { Table } from "./models/table";
 import { PictureFrame } from "./models/pictureFrame";
 import { Fireworks } from "./components/Fireworks";
 import { BirthdayCard } from "./components/BirthdayCard";
-import { NightSky } from "./components/NightSky";
+import { FairyLights } from "./components/FairyLights";
 
 import "./App.css";
 
@@ -77,6 +77,18 @@ const BACKGROUND_FADE_START = Math.max(
   BACKGROUND_FADE_END - BACKGROUND_FADE_DURATION,
   0
 );
+
+// The backdrop and the lighting come from the same 360° panorama: a sharp 4K
+// JPG to look at (tone-mapped in advance), and a small 1K HDR that only lights
+// the cake and frames.
+const BACKGROUND_FILE = "/background_4k.jpg";
+const LIGHTING_FILE = "/lighting_1k.hdr";
+// The panorama is a dusk seaside, so its light is dim; this brightens the
+// light it casts on the cake and frames.
+const ENVIRONMENT_LIGHT = 1.5;
+// Turn the panorama so the sunset glow sits behind the table in the opening
+// view (the camera starts on +x looking toward -x).
+const BACKGROUND_ROTATION: [number, number, number] = [0, Math.PI, 0];
 
 const TYPED_LINES = [
   "> baby",
@@ -568,28 +580,21 @@ export default function App() {
             activeCardId={activeCardId}
             onToggleCard={handleCardToggle}
           />
-          {/* Plum haze that melts the distant ground into the horizon. */}
-          <fog attach="fog" args={["#1c0d26", 15, 80]} />
           <ambientLight intensity={0.12} />
-          <hemisphereLight
-            color="#8d84d8"
-            groundColor="#2a0d18"
-            intensity={0.5 * environmentProgress}
-          />
-          {/* Moonlight, from the same direction as the moon in NightSky. */}
-          <directionalLight
-            intensity={0.7 * environmentProgress}
-            position={[-19, 6, -6]}
-            color="#aeb6ff"
-          />
           <directionalLight intensity={0.35} position={[6, 5, 3]} color="#ffcfa8" />
-          {/* Generated reflections so the gold stand and frames have something to shine with. */}
-          <Environment resolution={128} environmentIntensity={0.35 * environmentProgress}>
-            <Lightformer form="ring" intensity={2} color="#ffb877" position={[0, 6, 0]} rotation-x={Math.PI / 2} scale={8} />
-            <Lightformer intensity={1.2} color="#ff8fa3" position={[6, 2, 4]} scale={[6, 3, 1]} />
-            <Lightformer intensity={0.8} color="#8f9bff" position={[-8, 3, -4]} scale={[6, 3, 1]} />
-          </Environment>
-          <NightSky visibility={environmentProgress} />
+          {/* Backdrop and lighting both fade in after the typed intro. */}
+          <Environment
+            files={BACKGROUND_FILE}
+            background="only"
+            backgroundIntensity={environmentProgress}
+            backgroundRotation={BACKGROUND_ROTATION}
+          />
+          <Environment
+            files={LIGHTING_FILE}
+            environmentIntensity={ENVIRONMENT_LIGHT * environmentProgress}
+            environmentRotation={BACKGROUND_ROTATION}
+          />
+          <FairyLights visibility={environmentProgress} />
           <Fireworks isActive={fireworksActive} origin={[0, 10, 0]} />
           <ConfiguredOrbitControls />
         </Suspense>

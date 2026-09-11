@@ -2,7 +2,7 @@ import { CanvasTexture, SRGBColorSpace } from "three";
 
 let cachedGlow: CanvasTexture | null = null;
 
-// Soft radial falloff shared by every glowing light (bulbs, moon halo, flames).
+// Soft radial falloff shared by every glowing light (tea lights, fireworks).
 export function getGlowTexture() {
   if (cachedGlow) {
     return cachedGlow;

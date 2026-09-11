@@ -56,7 +56,7 @@ function createDrapeGeometry() {
 }
 
 const GINGHAM_WHITE = "#fbfcff";
-// Stronger than the reference's light blue: the purple moonlight greys it out.
+// Blue of the gingham checks.
 const GINGHAM_BLUE = "rgba(70, 135, 225, 0.6)";
 const CHECK_SIZE = 0.12; // world units per check
 
