@@ -79,7 +79,7 @@ const BACKGROUND_FADE_START = Math.max(
 );
 
 const TYPED_LINES = [
-  "> akshita",
+  "> baby",
   "...",
   "> today is your birthday",
   "...",
